@@ -1,1 +1,1 @@
-# ouath2-provider
+# oauth2-provider
