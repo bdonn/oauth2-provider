@@ -1,0 +1,8 @@
+buildscript {
+    ext.ktor_version = '1.2.4'
+}
+
+dependencies {
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+}

@@ -1,0 +1,6 @@
+rootProject.name = 'auth'
+
+include 'auth-account'
+include 'auth-oauth2'
+include 'auth-oidc'
+include 'auth-server-ktor'
