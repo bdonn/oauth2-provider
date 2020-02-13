@@ -3,7 +3,6 @@ package oauth2.code
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import oauth2.context.OAuth2Context
 import oauth2.exception.OAuth2AuthorizationFailedException
 import oauth2.request.OAuth2Request
 import javax.inject.Singleton
@@ -11,6 +10,7 @@ import javax.inject.Singleton
 data class AuthorizationCode(val code: String) {
     companion object {
         const val NAME = "code"
+        const val LENGTH = 10 // fixed length
     }
 }
 
@@ -20,7 +20,19 @@ interface OAuth2AuthorizationCodeGenerator {
 
 object AuthorizationCodeGenerator: OAuth2AuthorizationCodeGenerator {
     override fun generateCode(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return this.generateCodeByKotlinRandom()
+    }
+
+    private val pool = ('a' .. 'z') + ('A' .. 'Z') + ('0' .. '9')
+
+    // FIXME: 하위 구현체로 분리
+    private fun generateCodeByKotlinRandom(): String {
+        return (1..AuthorizationCode.LENGTH)
+            .map {
+                kotlin.random.Random.nextInt(0, pool.size)
+            }
+            .map(pool::get)
+            .joinToString("")
     }
 }
 
