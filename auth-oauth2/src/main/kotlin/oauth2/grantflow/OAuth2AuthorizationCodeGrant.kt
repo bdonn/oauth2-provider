@@ -12,7 +12,7 @@ import oauth2.context.InMemoryContextManager
 import oauth2.exception.OAuth2ClientAuthenticationFailedException
 import oauth2.exception.OAuth2ClientNotRegisteredException
 import oauth2.exception.OAuth2ContextNotSetupException
-import oauth2.grantflow.OAuth2GrantFlow
+import oauth2.grantflow.OAuth2Grant
 import oauth2.request.*
 import oauth2.response.*
 import oauth2.response.Code
@@ -26,8 +26,8 @@ typealias TokenRequest = OAuth2AuthorizationCodeGrantRequest.TokenRequest
 typealias AuthorizationResponse = OAuth2AuthorizationCodeGrantResponse.AuthorizationResponse
 typealias TokenResponse = OAuth2AuthorizationCodeGrantResponse.TokenResponse
 
-object OAuth2AuthorizationCodeGrantFlow :
-    OAuth2GrantFlow<OAuth2AuthorizationCodeGrantRequest, OAuth2AuthorizationCodeGrantResponse> {
+object OAuth2AuthorizationCodeGrant :
+    OAuth2Grant<OAuth2AuthorizationCodeGrantRequest, OAuth2AuthorizationCodeGrantResponse> {
 
     // FIXME: DI
     private val codeManager: OAuth2AuthorizationCodeManager = InMemoryAuthorizationCodeManager
@@ -40,12 +40,12 @@ object OAuth2AuthorizationCodeGrantFlow :
         request: OAuth2AuthorizationCodeGrantRequest
     ): OAuth2AuthorizationCodeGrantResponse {
         return when (request) {
-            is AuthorizationRequest -> this.processAuthorizationRequest(request)
-            is TokenRequest -> this.processTokenRequest(request)
+            is AuthorizationRequest -> this.handleAuthorizationRequest(request)
+            is TokenRequest -> this.handleTokenRequest(request)
         }
     }
 
-    private fun processAuthorizationRequest(
+    private fun handleAuthorizationRequest(
         request: AuthorizationRequest
     ): AuthorizationResponse {
 
@@ -70,7 +70,7 @@ object OAuth2AuthorizationCodeGrantFlow :
         )
     }
 
-    private fun processTokenRequest(request: TokenRequest): TokenResponse {
+    private fun handleTokenRequest(request: TokenRequest): TokenResponse {
 
         // validate request parameters
         request.validateParams()
@@ -82,7 +82,7 @@ object OAuth2AuthorizationCodeGrantFlow :
         // extract client information from request
         val clientId = request.clientId.value!! // not null after validation
         val clientSecret = request.clientCredential.clientSecret
-        val redirectUri = request.redirectUri?.value
+        val redirectUri = request.redirectUri.value
 
         // retrieve client
         val client = clientRegistrationManager.retrieveClient(clientId = clientId)

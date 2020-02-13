@@ -1,6 +1,6 @@
 package oauth2.grantflow.implicit
 
-import oauth2.grantflow.OAuth2GrantFlow
+import oauth2.grantflow.OAuth2Grant
 import oauth2.request.*
 import oauth2.response.*
 import oauth2.response.State
@@ -11,18 +11,18 @@ typealias AuthorizationRequest = OAuth2ImplicitGrantRequest.AuthorizationRequest
 typealias TokenResponse = OAuth2ImplicitGrantResponse.TokenResponse
 
 
-object OAuth2ImplicitGrantFlow : OAuth2GrantFlow<OAuth2ImplicitGrantRequest, OAuth2ImplicitGrantResponse> {
+object OAuth2ImplicitGrant : OAuth2Grant<OAuth2ImplicitGrantRequest, OAuth2ImplicitGrantResponse> {
 
     // FIXME: DI
     private val tokenManager: OAuth2TokenManager = InMemoryTokenManager
 
     override fun flow(request: OAuth2ImplicitGrantRequest): OAuth2ImplicitGrantResponse {
         return when (request) {
-            is AuthorizationRequest -> this.processAuthorizationRequest(request)
+            is AuthorizationRequest -> this.handleAuthorizationRequest(request)
         }
     }
 
-    private fun processAuthorizationRequest(request: AuthorizationRequest): TokenResponse {
+    private fun handleAuthorizationRequest(request: AuthorizationRequest): TokenResponse {
 
         // validate request parameters
         request.validateParams()

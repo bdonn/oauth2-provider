@@ -1,6 +1,6 @@
 package oauth2.grantflow
 
-import oauth2.grantflow.resourceowner.OAuth2ResourceOwnerPasswordCredentialsGrantFlow
+import oauth2.grantflow.resourceowner.OAuth2ResourceOwnerPasswordCredentialsGrant
 import oauth2.request.*
 import oauth2.response.OAuth2ResourceOwnerPasswordCredentialsGrantResponse
 import org.junit.Assert.*
@@ -26,7 +26,7 @@ class OAuth2ResourceOwnerPasswordCredentialsGrantFlowTest {
          * [When]
          */
         // grant flow
-        val response = OAuth2ResourceOwnerPasswordCredentialsGrantFlow.flow(
+        val response = OAuth2ResourceOwnerPasswordCredentialsGrant.flow(
             request = request
         )
 

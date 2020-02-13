@@ -1,27 +1,28 @@
 package oauth2.grantflow.clientcredentials
 
-import oauth2.grantflow.OAuth2GrantFlow
+import oauth2.grantflow.OAuth2Grant
 import oauth2.request.*
 import oauth2.response.*
+import oauth2.response.Scope
 import oauth2.token.InMemoryTokenManager
 import oauth2.token.OAuth2TokenManager
 
 typealias TokenRequest = OAuth2ClientCredentialsGrantRequest.TokenRequest
 typealias TokenResponse = OAuth2ClientCredentialsGrantResponse.TokenResponse
 
-object OAuth2ClientCredentialsGrantFlow:
-    OAuth2GrantFlow<OAuth2ClientCredentialsGrantRequest, OAuth2ClientCredentialsGrantResponse> {
+object OAuth2ClientCredentialsGrant:
+    OAuth2Grant<OAuth2ClientCredentialsGrantRequest, OAuth2ClientCredentialsGrantResponse> {
 
     // FIXME: DI
     private val tokenManager: OAuth2TokenManager = InMemoryTokenManager
 
     override fun flow(request: OAuth2ClientCredentialsGrantRequest): OAuth2ClientCredentialsGrantResponse {
         return when (request) {
-            is TokenRequest -> this.processTokenRequest(request)
+            is TokenRequest -> this.handleTokenRequest(request)
         }
     }
 
-    private fun processTokenRequest(request: TokenRequest): TokenResponse {
+    private fun handleTokenRequest(request: TokenRequest): TokenResponse {
 
         // validate request parameters
         request.validateParams()
@@ -37,7 +38,7 @@ object OAuth2ClientCredentialsGrantFlow:
             tokenType = TokenType(OAuth2TokenType.BEARER.type),
             expiresIn = ExpiresIn(time = accessToken.expiresIn),
             refreshToken = RefreshToken(refreshToken),
-            scope = null
+            scope = Scope(request.scope)
         )
     }
 }

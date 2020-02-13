@@ -1,6 +1,6 @@
 package oauth2.grantflow
 
-import oauth2.grantflow.implicit.OAuth2ImplicitGrantFlow
+import oauth2.grantflow.implicit.OAuth2ImplicitGrant
 import oauth2.request.*
 import oauth2.response.OAuth2ImplicitGrantResponse
 import org.junit.Assert.*
@@ -10,7 +10,7 @@ class OAuth2ImplicitGrantFlowTest {
 
     @Test
     fun `Implicit grant flow - Authorization endpoint 테스트`() {
-        val response = OAuth2ImplicitGrantFlow.flow(
+        val response = OAuth2ImplicitGrant.flow(
             request = OAuth2ImplicitGrantRequest.AuthorizationRequest(
                 responseType = ResponseType(OAuth2ResponseType.TOKEN.type),
                 redirectUri = RedirectUri("https://www.naver.com"),
