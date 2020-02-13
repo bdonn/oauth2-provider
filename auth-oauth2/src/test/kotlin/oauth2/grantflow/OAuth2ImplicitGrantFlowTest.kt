@@ -1,12 +1,11 @@
-package oauth2.grantflow
+package oauth2.grantflow.implicit
 
-import oauth2.grantflow.implicit.OAuth2ImplicitGrant
 import oauth2.request.*
 import oauth2.response.OAuth2ImplicitGrantResponse
 import org.junit.Assert.*
 import org.junit.Test
 
-class OAuth2ImplicitGrantFlowTest {
+class OAuth2ImplicitGrantTest {
 
     @Test
     fun `Implicit grant flow - Authorization endpoint 테스트`() {

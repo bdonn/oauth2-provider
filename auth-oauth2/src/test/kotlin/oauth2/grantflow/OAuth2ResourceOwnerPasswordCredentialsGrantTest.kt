@@ -1,12 +1,11 @@
-package oauth2.grantflow
+package oauth2.grantflow.resourceowner
 
-import oauth2.grantflow.resourceowner.OAuth2ResourceOwnerPasswordCredentialsGrant
 import oauth2.request.*
 import oauth2.response.OAuth2ResourceOwnerPasswordCredentialsGrantResponse
 import org.junit.Assert.*
 import org.junit.Test
 
-class OAuth2ResourceOwnerPasswordCredentialsGrantFlowTest {
+class OAuth2ResourceOwnerPasswordCredentialsGrantTest {
 
     @Test
     fun `Resource Owner Password Credentials grant flow - Token endpoint 테스트`() {
