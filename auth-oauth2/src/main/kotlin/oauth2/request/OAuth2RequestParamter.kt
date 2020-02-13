@@ -30,7 +30,7 @@ interface OAuth2RequestParameter : OAuth2Parameter {
     fun validate(request: OAuth2Request, grantType: OAuth2GrantType, endpoint: OAuth2Endpoint): Boolean = true // default validation ok
 }
 
-data class ClientId(override val value: String?) : OAuth2RequestParameter {
+data class ClientId(override val value: String) : OAuth2RequestParameter {
 
     companion object {
         const val NAME = "client_id"
@@ -49,7 +49,6 @@ data class ClientId(override val value: String?) : OAuth2RequestParameter {
 
     override fun validate(request: OAuth2Request, grantType: OAuth2GrantType, endpoint: OAuth2Endpoint) =
             !(isRequired(grantType, endpoint) && value.isNullOrEmpty())
-                && (request.params.find { print(it); it?.name == ClientCredential.NAME } as ClientCredential?)?.clientId == value
 }
 
 data class RedirectUri(override val value: String?) : OAuth2RequestParameter {
@@ -70,6 +69,8 @@ data class RedirectUri(override val value: String?) : OAuth2RequestParameter {
 }
 
 data class ResponseType(override val value: String?) : OAuth2RequestParameter {
+
+    constructor(responseType: OAuth2ResponseType) : this(responseType.type)
 
     companion object {
         const val NAME = "response_type"
@@ -187,7 +188,7 @@ data class Password(override val value: String?) : OAuth2RequestParameter {
 data class ClientCredential(override val value: String?, val clientId: String?, val clientSecret: String?) : OAuth2RequestParameter {
 
     companion object {
-        const val NAME = "Authorization"
+        const val NAME = "client_id"
     }
 
     override val name
