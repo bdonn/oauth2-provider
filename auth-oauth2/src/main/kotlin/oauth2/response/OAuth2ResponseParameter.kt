@@ -139,8 +139,9 @@ data class State(override val value: String?): OAuth2ResponseParameter {
         get() = NAME
 
     override fun isRequired(grantType: OAuth2GrantType, endpoint: OAuth2Endpoint, context: OAuth2Context?) =
-        grantType == OAuth2GrantType.AUTHORIZATION_CODE_GRANT && endpoint == OAuth2Endpoint.AUTHORIZATION
-        || grantType == OAuth2GrantType.IMPLICIT_GRANT && endpoint == OAuth2Endpoint.AUTHORIZATION && !context?.state.let { it?.value.isNullOrEmpty() }
+        (grantType == OAuth2GrantType.AUTHORIZATION_CODE_GRANT && endpoint == OAuth2Endpoint.AUTHORIZATION
+            || grantType == OAuth2GrantType.IMPLICIT_GRANT && endpoint == OAuth2Endpoint.AUTHORIZATION)
+         && context?.state?.let { it?.value.isNullOrEmpty() } ?: false
 
     override fun validate(grantType: OAuth2GrantType, endpoint: OAuth2Endpoint, context: OAuth2Context?) =
         !(isRequired(grantType, endpoint, context) && value.isNullOrEmpty()) // && checkFormat, checkRange
