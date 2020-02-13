@@ -138,7 +138,7 @@ sealed class OAuth2ClientCredentialsGrantResponse(override val context: OAuth2Co
         val refreshToken: RefreshToken?, // OPTIONAL
         val scope: Scope? // OPTIONAL(if identical to the scope requested by the client), otherwise REQUIRED
     ) : OAuth2ClientCredentialsGrantResponse(context = context) {
-        override val params = listOf(accessToken)
+        override val params = listOf(accessToken , tokenType , expiresIn, refreshToken , scope)
 
         override fun validateParams() {
             // common validation
