@@ -5,6 +5,8 @@ plugins {
 
 ext {
     daggerVersion = '2.12'
+    kotlinTestVersion = '3.4.0'
+    koinVersion = '2.0.1'
 }
 
 apply plugin: 'application'
@@ -35,9 +37,19 @@ subprojects {
 
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation "org.koin:koin-core:$koinVersion"
+        implementation "org.koin:koin-core-ext:$koinVersion"
+
         api "com.google.dagger:dagger:$daggerVersion"
         annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+
+        testImplementation "org.koin:koin-test:$koinVersion"
+        testImplementation "io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion"
+        testImplementation "io.kotlintest:kotlintest-extensions-koin:$kotlinTestVersion"
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     compileKotlin {
