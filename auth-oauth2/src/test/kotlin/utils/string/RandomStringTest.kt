@@ -66,11 +66,12 @@ class RandomStringSpecTest: FunSpec({
     }
 })
 
-private val testModule = module {
-    single<RandomStringGenerator> { RandomStringGeneratorImpl }
-}
-
 class RandomStringTest: FunSpec() , KoinTest {
+
+    private val testModule = module {
+        single<RandomStringGenerator> { RandomStringGeneratorImpl }
+    }
+
     override fun listeners() = listOf(KoinListener(testModule))
 
     private val randomStringGenerator by inject<RandomStringGenerator>()
