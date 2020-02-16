@@ -9,7 +9,7 @@ interface OAuth2ClientAuthenticationManager {
 object ClientAuthenticationManager: OAuth2ClientAuthenticationManager {
     override fun authenticate(client: OAuth2Client, clientSecret: String?, redirectUri: String?): Boolean {
         // FIXME: SHA256 hash
-        return client.type == OAuth2ClientType.PUBLIC
-                || client.clientSecret == clientSecret && client.redirectUri == redirectUri
+        return !client.isConfidential() // public client: no authentication
+                || clientSecret != null && client.clientSecret == clientSecret && client.props?.redirectUris?.contains(redirectUri) ?: false
     }
 }
