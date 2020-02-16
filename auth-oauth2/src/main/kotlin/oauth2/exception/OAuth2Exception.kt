@@ -48,16 +48,20 @@ open class OAuth2ClientException: OAuth2Exception {
     constructor(description: String): super(description = description)
 }
 
-open class OAuth2ClientAlreadyRegisteredException: OAuth2ClientException {
-    constructor(clientId: String): super(description = "$clientId")
+open class OAuth2ClientPropDuplicateException: OAuth2ClientException {
+    constructor(vararg props: Pair<String, Any>): super(description = props.joinToString { "${it.first}: ${it.second}" })
 }
 
 open class OAuth2ClientNotRegisteredException: OAuth2ClientException {
-    constructor(clientId: String): super(description = "$clientId")
+    constructor(clientId: String): super(description = "ClientId: $clientId")
 }
 
 open class OAuth2ClientAuthenticationFailedException: OAuth2ClientException {
-    constructor(clientId: String): super(description = "$clientId")
+    constructor(clientId: String): super(description = "ClientId: $clientId")
+}
+
+open class OAuth2InvalidClientPropException: OAuth2ClientException {
+    constructor(propName: String, propValue: Any): super(description = "$propName: $propValue")
 }
 
 /**
