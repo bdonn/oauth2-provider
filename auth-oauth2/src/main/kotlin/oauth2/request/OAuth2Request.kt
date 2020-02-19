@@ -4,7 +4,7 @@ import oauth2.exception.OAuth2InvalidRequestParameterException
 
 sealed class OAuth2Request {
 
-    abstract fun validateParams()
+    abstract fun validate()
     abstract val params: List<OAuth2RequestParameter?>
 
     protected fun validateParams(request: OAuth2Request, grantType: OAuth2GrantType, endpoint: OAuth2Endpoint) {
@@ -20,13 +20,13 @@ sealed class OAuth2AuthorizationCodeGrantRequest : OAuth2Request() {
     data class AuthorizationRequest(
         val responseType: ResponseType, // REQUIRED
         val clientId: ClientId, // REQUIRED
-        val redirectUri: RedirectUri?, // OPTIONAL
-        val scope: Scope?, // OPTIONAL
-        val state: State? // RECOMMENDED
+        val redirectUri: RedirectUri? = null, // OPTIONAL
+        val scope: Scope? = null, // OPTIONAL
+        val state: State? = null// RECOMMENDED
     ) : OAuth2AuthorizationCodeGrantRequest() {
         override val params = listOf(responseType, scope, clientId, redirectUri, state)
 
-        override fun validateParams() {
+        override fun validate() {
             // common validation
             super.validateParams(
                 request = this,
@@ -47,7 +47,7 @@ sealed class OAuth2AuthorizationCodeGrantRequest : OAuth2Request() {
     ) : OAuth2AuthorizationCodeGrantRequest() {
         override val params = listOf(grantType, code, redirectUri, clientId, clientCredential)
 
-        override fun validateParams() {
+        override fun validate() {
             // common validation
             super.validateParams(
                 request = this,
@@ -70,7 +70,7 @@ sealed class OAuth2ImplicitGrantRequest : OAuth2Request() {
     ) : OAuth2ImplicitGrantRequest() {
         override val params = listOf(responseType, clientId, redirectUri, scope, state)
 
-        override fun validateParams() {
+        override fun validate() {
             // common validation
             super.validateParams(
                 request = this,
@@ -96,7 +96,7 @@ sealed class OAuth2ResourceOwnerPasswordCredentialsGrantRequest : OAuth2Request(
     ) : OAuth2ResourceOwnerPasswordCredentialsGrantRequest() {
         override val params = listOf(grantType, username, password, scope)
 
-        override fun validateParams() {
+        override fun validate() {
             // common validation
             super.validateParams(
                 request = this,
@@ -118,7 +118,7 @@ sealed class OAuth2ClientCredentialsGrantRequest : OAuth2Request() {
     ) : OAuth2ClientCredentialsGrantRequest() {
         override val params = listOf(grantType, scope)
 
-        override fun validateParams() {
+        override fun validate() {
             // common validation
             super.validateParams(
                 request = this,
