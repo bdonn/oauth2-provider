@@ -15,7 +15,7 @@ interface RandomStringGenerator {
     fun generate(spec: RandomStringSpec?): String
 }
 
-object RandomStringGeneratorImpl : RandomStringGenerator{
+object RandomStringGeneratorImpl: RandomStringGenerator{
     override fun generate(spec: RandomStringSpec?): String {
         val pool = spec?.pool ?: RandomStringSpec.DEFAULT_POOL
         return (1..(spec?.length ?: RandomStringSpec.DEFAULT_LENGTH))
