@@ -1,7 +1,11 @@
 package oauth2.client
 
+import oauth2.exception.OAuth2ClientRedirectUriNotEstablishedException
+import oauth2.exception.OAuth2ClientResponseTypeNotMatchedException
 import oauth2.request.OAuth2GrantType
 import oauth2.request.OAuth2ResponseType
+import oauth2.request.RedirectUri
+import oauth2.request.ResponseType
 
 enum class OAuth2ClientProfile(val profile: String) {
     WEB_APP("web application"),
@@ -16,22 +20,22 @@ enum class OAuth2ClientTokenEndpointAuthMethod {
 }
 
 data class OAuth2ClientProps(
-    val redirectUris: Set<String>,
-    val tokenEndpointAuthMethod: OAuth2ClientTokenEndpointAuthMethod,
-    val grantTypes: Set<OAuth2GrantType>,
-    val responseTypes: Set<OAuth2ResponseType>,
-    val clientName: String?,
-    val clientUri: String,
-    val logoUri: String?,
-    val scope: String?,
-    val contacts: List<String>?,
-    val tosUri: String?,
-    val policyUri: String?,
-    val jwksUri: String?,
-    val jwks: List<String>?,
-    val softwareId: String, // required?
-    val softwareVersion: String?,
-    val profiles: Set<OAuth2ClientProfile>
+    val redirectUris: Set<String> = setOf(),
+    val tokenEndpointAuthMethod: OAuth2ClientTokenEndpointAuthMethod = OAuth2ClientTokenEndpointAuthMethod.NONE,
+    val grantTypes: Set<OAuth2GrantType> = setOf(),
+    val responseTypes: Set<OAuth2ResponseType> = setOf(),
+    val clientName: String? = null,
+    val clientUri: String = "",
+    val logoUri: String? = null,
+    val scope: String? = null,
+    val contacts: List<String>? = null,
+    val tosUri: String? = null,
+    val policyUri: String? = null,
+    val jwksUri: String? = null,
+    val jwks: List<String>? = null,
+    val softwareId: String = "", // required?
+    val softwareVersion: String? = null,
+    val profiles: Set<OAuth2ClientProfile>? = null
 ) {
     constructor(request: OAuth2ClientRegistrationRequest) : this(
         redirectUris = request.redirectUris,
@@ -55,10 +59,26 @@ data class OAuth2ClientProps(
 
 data class OAuth2Client(
     val clientId: String, // Issued by the authorization server
-    val clientSecret: String?, // Issued by the authorization server
-    val props: OAuth2ClientProps?
+    val clientSecret: String? = null, // Issued by the authorization server
+    val props: OAuth2ClientProps = OAuth2ClientProps()
 ) {
-    fun isConfidential(): Boolean = isConfidential(this.props?.tokenEndpointAuthMethod)
+    fun isConfidential(): Boolean = isConfidential(this.props.tokenEndpointAuthMethod)
+
+    fun validateAndResolveRedirectUri(redirectUri: RedirectUri?) = this.validateAndResolveRedirectUri(redirectUri?.value)
+
+    fun validateAndResolveRedirectUri(redirectUri: String?): String {
+        if(redirectUri != null && !this.props.redirectUris.isNullOrEmpty() && this.props.redirectUris.contains(redirectUri)) {
+            throw OAuth2ClientRedirectUriNotEstablishedException(clientId = this.clientId)
+        }
+
+        return redirectUri ?: this.props.redirectUris.first()
+    }
+
+    fun validateResponseType(responseType: ResponseType) {
+        if(!this.props.responseTypes.any { it.type == responseType.value }) {
+            throw OAuth2ClientResponseTypeNotMatchedException(clientId = clientId, responseType = responseType)
+        }
+    }
 
     companion object {
         fun isConfidential(tokenEndpointAuthMethod: OAuth2ClientTokenEndpointAuthMethod?): Boolean = tokenEndpointAuthMethod != OAuth2ClientTokenEndpointAuthMethod.NONE

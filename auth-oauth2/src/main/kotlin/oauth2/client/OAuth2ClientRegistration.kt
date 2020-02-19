@@ -22,21 +22,21 @@ data class OAuth2ClientRegistrationRequest(
     val tokenEndpointAuthMethod: OAuth2ClientTokenEndpointAuthMethod = OAuth2ClientTokenEndpointAuthMethod.NONE,
     val grantTypes: Set<OAuth2GrantType>,
     val responseTypes: Set<OAuth2ResponseType>,
-    val clientName: String?,
-    val clientUri: String,
-    val logoUri: String?,
-    val scope: String?,
-    val contacts: List<String>?,
-    val tosUri: String?,
-    val policyUri: String?,
-    val jwksUri: String?,
-    val jwks: List<String>?,
-    val softwareId: String, // required?
-    val softwareVersion: String?,
-    val profiles: Set<OAuth2ClientProfile>
+    val clientName: String? = null,
+    val clientUri: String = "",
+    val logoUri: String? = null,
+    val scope: String? = null,
+    val contacts: List<String>? = null,
+    val tosUri: String? = null,
+    val policyUri: String? = null,
+    val jwksUri: String? = null,
+    val jwks: List<String>? = null,
+    val softwareId: String = "", // required?
+    val softwareVersion: String? = null,
+    val profiles: Set<OAuth2ClientProfile>? = null
 )
 
-interface OAuth2ClientRegistrationManager {
+interface OAuth2ClientRegistrationManager: KoinComponent {
     fun registerClient(request: OAuth2ClientRegistrationRequest): OAuth2Client
 
     fun unregisterClient(client: OAuth2Client)
@@ -46,7 +46,7 @@ interface OAuth2ClientRegistrationManager {
     fun clear()
 }
 
-internal object ClientRegistrationManager: OAuth2ClientRegistrationManager, KoinComponent {
+internal object ClientRegistrationManager: OAuth2ClientRegistrationManager {
 
     private val randomStringGenerator by inject<RandomStringGenerator>()
 
@@ -164,11 +164,11 @@ class InMemoryClientRegistry: OAuth2ClientRegistry {
 
     override fun checkClientRegistered(clientId: String) = clientId in map
 
-    override fun checkRedirectUriDuplicate(redirectUri: String) = map.any { it.value.props?.redirectUris?.contains(redirectUri) ?: false }
+    override fun checkRedirectUriDuplicate(redirectUri: String) = map.any { it.value.props.redirectUris.contains(redirectUri) }
 
-    override fun checkRedirectUriDuplicate(redirectUris: Set<String>) = map.any { it.value.props?.redirectUris?.intersect(redirectUris)?.isNotEmpty() ?: false}
+    override fun checkRedirectUriDuplicate(redirectUris: Set<String>) = map.any { it.value.props.redirectUris.intersect(redirectUris).isNotEmpty()}
 
-    override fun checkClientUriDuplicate(clientUri: String) = map.any { it.value.props?.clientUri == clientUri }
+    override fun checkClientUriDuplicate(clientUri: String) = map.any { it.value.props.clientUri == clientUri }
 
     override fun isEmpty(): Boolean = map.isEmpty()
 

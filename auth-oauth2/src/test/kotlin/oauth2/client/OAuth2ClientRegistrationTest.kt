@@ -13,7 +13,6 @@ import oauth2.exception.OAuth2ClientPropDuplicateException
 import oauth2.exception.OAuth2InvalidClientPropException
 import oauth2.request.OAuth2GrantType
 import oauth2.request.OAuth2ResponseType
-import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.inject
@@ -483,36 +482,41 @@ class OAuth2ClientRegistrationTest: FunSpec(), KoinTest {
     val assertByRequest = { client: OAuth2Client, registrationRequest: OAuth2ClientRegistrationRequest ->
 
         assertClientId(client.clientId)
-        assertClientSecret(client.clientSecret , client.props?.tokenEndpointAuthMethod)
+        assertClientSecret(client.clientSecret , client.props.tokenEndpointAuthMethod)
 
-        client.props?.tokenEndpointAuthMethod shouldBe registrationRequest.tokenEndpointAuthMethod
-        client.props?.redirectUris shouldContainExactlyInAnyOrder registrationRequest.redirectUris
-        client.props?.grantTypes shouldContainExactlyInAnyOrder registrationRequest.grantTypes
-        client.props?.responseTypes shouldContainExactlyInAnyOrder registrationRequest.responseTypes
-        client.props?.clientName shouldBe registrationRequest.clientName
-        client.props?.clientUri shouldBe registrationRequest.clientUri
-        client.props?.logoUri shouldBe registrationRequest.logoUri
-        client.props?.scope shouldBe if(registrationRequest.scope.isNullOrEmpty()) "" else registrationRequest.scope
+        client.props.tokenEndpointAuthMethod shouldBe registrationRequest.tokenEndpointAuthMethod
+        client.props.redirectUris shouldContainExactlyInAnyOrder registrationRequest.redirectUris
+        client.props.grantTypes shouldContainExactlyInAnyOrder registrationRequest.grantTypes
+        client.props.responseTypes shouldContainExactlyInAnyOrder registrationRequest.responseTypes
+        client.props.clientName shouldBe registrationRequest.clientName
+        client.props.clientUri shouldBe registrationRequest.clientUri
+        client.props.logoUri shouldBe registrationRequest.logoUri
+        client.props.scope shouldBe if(registrationRequest.scope.isNullOrEmpty()) "" else registrationRequest.scope
 
         if(registrationRequest.contacts == null) {
-            client.props?.contacts.shouldBeNull()
+            client.props.contacts.shouldBeNull()
         } else {
-            client.props?.contacts shouldContainExactlyInAnyOrder registrationRequest.contacts!!
+            client.props.contacts shouldContainExactlyInAnyOrder registrationRequest.contacts!!
         }
 
-        client.props?.tosUri shouldBe registrationRequest.tosUri
-        client.props?.policyUri shouldBe registrationRequest.policyUri
-        client.props?.jwksUri shouldBe registrationRequest.jwksUri
+        client.props.tosUri shouldBe registrationRequest.tosUri
+        client.props.policyUri shouldBe registrationRequest.policyUri
+        client.props.jwksUri shouldBe registrationRequest.jwksUri
 
         if(registrationRequest.jwks == null) {
-            client.props?.jwks.shouldBeNull()
+            client.props.jwks.shouldBeNull()
         } else {
-            client.props?.jwks shouldContainExactlyInAnyOrder registrationRequest.jwks!!
+            client.props.jwks shouldContainExactlyInAnyOrder registrationRequest.jwks!!
         }
 
-        client.props?.softwareId shouldBe registrationRequest.softwareId
-        client.props?.softwareVersion shouldBe registrationRequest.softwareVersion
-        client.props?.profiles shouldContainExactlyInAnyOrder registrationRequest.profiles
+        client.props.softwareId shouldBe registrationRequest.softwareId
+        client.props.softwareVersion shouldBe registrationRequest.softwareVersion
+
+        if(client.props.profiles == null) {
+            client.props.profiles.shouldBeNull()
+        } else {
+            client.props.profiles shouldContainExactlyInAnyOrder registrationRequest.profiles!!
+        }
     }
 
     private val testModule = module {
