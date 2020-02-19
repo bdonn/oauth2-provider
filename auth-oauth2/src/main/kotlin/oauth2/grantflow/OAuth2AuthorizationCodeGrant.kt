@@ -1,14 +1,10 @@
 package oauth2.grantflow.authorizationcode
 
-import oauth2.client.ClientAuthenticationManager
-import oauth2.client.ClientRegistrationManager
 import oauth2.client.OAuth2ClientAuthenticationManager
 import oauth2.client.OAuth2ClientRegistrationManager
 import oauth2.code.AuthorizationCode
 import oauth2.code.OAuth2AuthorizationCodeManager
-import oauth2.code.InMemoryAuthorizationCodeManager
 import oauth2.context.OAuth2ContextManager
-import oauth2.context.InMemoryContextManager
 import oauth2.exception.OAuth2ClientAuthenticationFailedException
 import oauth2.exception.OAuth2ClientNotRegisteredException
 import oauth2.exception.OAuth2ContextNotSetupException
@@ -18,23 +14,21 @@ import oauth2.response.*
 import oauth2.response.Code
 import oauth2.response.Scope
 import oauth2.response.State
-import oauth2.token.InMemoryTokenManager
 import oauth2.token.OAuth2TokenManager
+import org.koin.core.KoinComponent
 
 typealias AuthorizationRequest = OAuth2AuthorizationCodeGrantRequest.AuthorizationRequest
 typealias TokenRequest = OAuth2AuthorizationCodeGrantRequest.TokenRequest
 typealias AuthorizationResponse = OAuth2AuthorizationCodeGrantResponse.AuthorizationResponse
 typealias TokenResponse = OAuth2AuthorizationCodeGrantResponse.TokenResponse
 
-object OAuth2AuthorizationCodeGrant :
-    OAuth2Grant<OAuth2AuthorizationCodeGrantRequest, OAuth2AuthorizationCodeGrantResponse> {
-
-    // FIXME: DI
-    private val codeManager: OAuth2AuthorizationCodeManager = InMemoryAuthorizationCodeManager
-    private val tokenManager: OAuth2TokenManager = InMemoryTokenManager
-    private val contextManager: OAuth2ContextManager = InMemoryContextManager
-    private val clientRegistrationManager: OAuth2ClientRegistrationManager = ClientRegistrationManager
-    private val clientAuthenticationManager: OAuth2ClientAuthenticationManager = ClientAuthenticationManager
+class OAuth2AuthorizationCodeGrant(
+    private val clientRegistrationManager: OAuth2ClientRegistrationManager,
+    private val clientAuthenticationManager: OAuth2ClientAuthenticationManager,
+    private val codeManager: OAuth2AuthorizationCodeManager,
+    private val tokenManager: OAuth2TokenManager,
+    private val contextManager: OAuth2ContextManager
+): OAuth2Grant<OAuth2AuthorizationCodeGrantRequest, OAuth2AuthorizationCodeGrantResponse>, KoinComponent {
 
     override fun flow(
         request: OAuth2AuthorizationCodeGrantRequest
@@ -50,11 +44,23 @@ object OAuth2AuthorizationCodeGrant :
     ): AuthorizationResponse {
 
         // validate request parameters
-        request.validateParams()
+        request.validate()
 
         // TODO: check if resource owner is authenticated
 
         // TODO: check if resource owner's approval is obtained
+
+        // retrieve client
+        val client = clientRegistrationManager.retrieveClient(clientId = request.clientId.value)
+
+        // client not registered
+        client ?: throw OAuth2ClientNotRegisteredException(clientId = request.clientId.value)
+
+        // validate response type
+        client.validateResponseType(request.responseType)
+
+        // validate and resolve redirect uri
+        val redirectUri = client.validateAndResolveRedirectUri(redirectUri = request.redirectUri)
 
         // generate authorization code
         val code = codeManager.issueAuthorizationCode(request)
@@ -65,6 +71,7 @@ object OAuth2AuthorizationCodeGrant :
         // create new Authorization Response and return it
         return AuthorizationResponse(
             context = context,
+            redirectUri = redirectUri,
             code = Code(code),
             state = State(request.state)
         )
@@ -73,14 +80,14 @@ object OAuth2AuthorizationCodeGrant :
     private fun handleTokenRequest(request: TokenRequest): TokenResponse {
 
         // validate request parameters
-        request.validateParams()
+        request.validate()
 
         // retrieve context
         val context = contextManager.retrieveContext(request)
         context ?: throw OAuth2ContextNotSetupException()
 
         // extract client information from request
-        val clientId = request.clientId.value!! // not null after validation
+        val clientId = request.clientId.value
         val clientSecret = request.clientCredential.clientSecret
         val redirectUri = request.redirectUri.value
 
