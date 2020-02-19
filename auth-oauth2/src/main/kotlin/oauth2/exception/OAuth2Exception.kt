@@ -1,7 +1,9 @@
 package oauth2.exception
 
 import oauth2.client.OAuth2Client
+import oauth2.request.OAuth2GrantType
 import oauth2.request.OAuth2RequestParameter
+import oauth2.request.ResponseType
 import oauth2.response.OAuth2ResponseParameter
 
 open class OAuth2Exception: Exception {
@@ -62,6 +64,18 @@ open class OAuth2ClientAuthenticationFailedException: OAuth2ClientException {
 
 open class OAuth2InvalidClientPropException: OAuth2ClientException {
     constructor(propName: String, propValue: Any): super(description = "$propName: $propValue")
+}
+
+open class OAuth2ClientRedirectUriNotEstablishedException: OAuth2ClientException {
+    constructor(clientId: String): super(description = "ClientId: $clientId")
+}
+
+open class OAuth2ClientGrantTypeNotMatchedException: OAuth2ClientException {
+    constructor(clientId: String, grantType: OAuth2GrantType): super(description = "ClientId: $clientId, GrantType: ${grantType.type}")
+}
+
+open class OAuth2ClientResponseTypeNotMatchedException: OAuth2ClientException {
+    constructor(clientId: String, responseType: ResponseType): super(description = "ClientId: $clientId, ResponseType: ${responseType.value}")
 }
 
 /**
