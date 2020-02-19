@@ -1,11 +1,7 @@
 package oauth2.code
 
-import dagger.Component
-import dagger.Module
-import dagger.Provides
 import oauth2.exception.OAuth2AuthorizationFailedException
 import oauth2.request.OAuth2Request
-import javax.inject.Singleton
 
 data class AuthorizationCode(val code: String) {
     companion object {
@@ -76,23 +72,5 @@ object InMemoryAuthorizationCodeManager: OAuth2AuthorizationCodeManager {
         code ?: throw OAuth2AuthorizationFailedException(code = value)
 
         // TODO: check if code is associated with request(client)
-    }
-}
-
-@Module
-class AuthorizationCodeModule {
-
-    @Provides
-    @Singleton
-    fun provideAuthorizationCodeManager() = InMemoryAuthorizationCodeManager
-}
-
-@Singleton
-@Component(modules = [AuthorizationCodeModule::class])
-interface AuthorizationCodeComponent {
-
-    @Component.Builder
-    interface Builder {
-        fun build(): AuthorizationCodeComponent
     }
 }
